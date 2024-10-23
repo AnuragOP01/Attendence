@@ -38,33 +38,77 @@ const Attendence = () => {
     { rollNo: 26, name: 'Carter Allen', fathersName: 'Mr. Allen', present: false, email: 'carter@example.com' },
   ];
 
-  const [checkedStudents , setCheckedStudents] = useState(new Array(students.length).fill(false));
-
-  const [markAbsent , setMarkAbsent] = useState(new Array(students.length).fill(false));
+  const [checkedStudents, setCheckedStudents] = useState(new Array(students.length).fill(false));
+  const [markAbsent, setMarkAbsent] = useState(new Array(students.length).fill(false));
+  const [markLeave, setMarkLeave] = useState(new Array(students.length).fill(false));
 
   const handleCheckAll = () => {
     setCheckedStudents(new Array(students.length).fill(true));
+    setMarkAbsent(new Array(students.length).fill(false));
+    setMarkLeave(new Array(students.length).fill(false));
   };
 
   const handleAbsentAll = () => {
     setMarkAbsent(new Array(students.length).fill(true));
+    setCheckedStudents(new Array(students.length).fill(false));
+    setMarkLeave(new Array(students.length).fill(false));
+  };
+
+  const handleLeaveAll = () => {
+    setMarkLeave(new Array(students.length).fill(true));
+    setCheckedStudents(new Array(students.length).fill(false));
+    setMarkAbsent(new Array(students.length).fill(false));
   };
 
   const handleClearAll = () => {
     setMarkAbsent(new Array(students.length).fill(false));
     setCheckedStudents(new Array(students.length).fill(false));
+    setMarkLeave(new Array(students.length).fill(false));
   };
 
   const handleCheckboxChange = (index) => {
     const updatedCheckedStudents = [...checkedStudents];
     updatedCheckedStudents[index] = !updatedCheckedStudents[index];
     setCheckedStudents(updatedCheckedStudents);
+  
+    if (updatedCheckedStudents[index]) {
+      const updatedMarkAbsent = [...markAbsent];
+      const updatedMarkLeave = [...markLeave];
+      updatedMarkAbsent[index] = false;
+      updatedMarkLeave[index] = false;
+      setMarkAbsent(updatedMarkAbsent);
+      setMarkLeave(updatedMarkLeave);
+    }
   };
 
   const handleAbsentChange = (index) => {
-    const updatedCheckedStudents = [...markAbsent];
-    updatedCheckedStudents[index] = !updatedCheckedStudents[index];
-    setMarkAbsent(updatedCheckedStudents);
+    const updatedMarkedStudents = [...markAbsent];
+    updatedMarkedStudents[index] = !updatedMarkedStudents[index];
+    setMarkAbsent(updatedMarkedStudents);
+  
+    if (updatedMarkedStudents[index]) {
+      const updatedCheckedStudents = [...checkedStudents];
+      const updatedMarkLeave = [...markLeave];
+      updatedCheckedStudents[index] = false;
+      updatedMarkLeave[index] = false;
+      setCheckedStudents(updatedCheckedStudents);
+      setMarkLeave(updatedMarkLeave);
+    }
+  };
+
+  const handleLeaveChange = (index) => {
+    const updatedMarkLeave = [...markLeave];
+    updatedMarkLeave[index] = !updatedMarkLeave[index];
+    setMarkLeave(updatedMarkLeave);
+  
+    if (updatedMarkLeave[index]) {
+      const updatedCheckedStudents = [...checkedStudents];
+      const updatedMarkAbsent = [...markAbsent];
+      updatedCheckedStudents[index] = false;
+      updatedMarkAbsent[index] = false;
+      setCheckedStudents(updatedCheckedStudents);
+      setMarkAbsent(updatedMarkAbsent);
+    }
   };
 
   const handleSubmit = () => {
@@ -77,8 +121,7 @@ const Attendence = () => {
       draggable: true,
       progress: undefined,
     });
-    toast.error("This is an error toast!");
-  }
+  };
 
   
 
@@ -90,27 +133,28 @@ const Attendence = () => {
       <div className='my-5'>
       <h1 className="font-bold text-center mt-4 my-4 text-xl">Student Attendance</h1>
       <div className="flex flex-wrap lg:flex-nowrap justify-evenly">
-        <div className="flex items-center justify-center h-full">
+        <div className="flex flex-col items-center justify-center h-full">
           <label
             htmlFor="class-section"
             className="block mb-2 text-sm font-medium text-gray-500 dark:text-white ml-4"
           >
-            Select Class Section <span className="text-red-500">*</span>
+            Select Batch <span className="text-red-500">*</span>
           </label>
           <select
             id="class-section"
             value={classSection}
             onChange={(e) => setClassSection(e.target.value)}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 w-32 ml-8"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 w-44 ml-8"
           >
             <option value="" disabled>Select class</option>
-            <option value="A">Section A</option>
-            <option value="B">Section B</option>
-            <option value="C">Section C</option>
+            <option value="Phase I">Phase I</option>
+            <option value="B">Phase II</option>
+            <option value="C">Section III Part I</option>
+            <option value="D">Section III Part II</option>
           </select>
         </div>
 
-        <div className="flex items-center justify-center h-full">
+        <div className="flex flex-col items-center justify-center h-full">
           <label
             htmlFor="attendance-date"
             className="block mb-2 text-sm font-medium text-gray-500 dark:text-white ml-5"
@@ -126,7 +170,7 @@ const Attendence = () => {
           />
         </div>
 
-        <div className="flex items-center justify-center h-full">
+        <div className="flex flex-col items-center justify-center h-full">
           <label
             htmlFor="time-slot"
             className="block mb-2 text-sm font-medium text-gray-500 dark:text-white ml-4"
@@ -151,7 +195,7 @@ const Attendence = () => {
           </select>
         </div>
 
-        <div className="flex items-center justify-center h-full">
+        <div className="flex flex-col items-center justify-center h-full">
           <label
             htmlFor="subject"
             className="block mb-2 text-sm font-medium text-gray-500 dark:text-white ml-4"
@@ -175,6 +219,37 @@ const Attendence = () => {
             <option value="Extra">Extra</option>
           </select>
         </div>
+
+        <div className="flex flex-col items-center justify-center h-full">
+          <label
+            htmlFor="subject"
+            className="block mb-2 text-sm font-medium text-gray-500 dark:text-white ml-4"
+          >
+            Select Subject <span className="text-red-500">*</span>
+          </label>
+          <select
+            id="subject"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          >
+            <option value="" disabled>Select User Group</option>
+            <option value="lecture 1">lecture 1</option>
+            <option value="lecture 2">lecture 2</option>
+            <option value="lecture 3">lecture 3</option>
+            <option value="lecture 4">lecture 4</option>
+            <option value="lecture 5">lecture 5</option>
+            <option value="lecture 6">lecture 6</option>
+            <option value="lecture 7">lecture 7</option>
+            <option value="lecture 8">lecture 8</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="w-1/2 m-auto mt-5">
+        <button className=" px-4 py-2 bg-blue-600  text-black rounded border-2">
+          Search
+        </button>
       </div>
       </div>
       {/* this is the end of selection things */}
@@ -184,24 +259,29 @@ const Attendence = () => {
         <table className="min-w-full bg-white border border-gray-200">
           <thead>
             <tr>
-              
               <th className="py-2 px-4 border-b text-black text-left">Roll No</th>
               <th className="py-2 px-4 border-b text-black text-left">Name</th>
               <th className="py-2 px-4 border-b text-black text-left">Father's Name</th>
-
-              <th className="py-2 px-4 border-b text-black text-left "><button
-                onClick={handleAbsentAll}
-                className=" px-4 py-2  text-black bg-red-600 rounded border-2 ">
-                Absent <i class="fa-regular fa-circle"></i>
-              </button>
-              </th>
-
               <th className="py-2 px-4 border-b text-black text-left">
-              <button
-              onClick={handleCheckAll}
-              className=" px-4 py-2 bg-green-600  text-black rounded border-2">
-              Present <i class="fa-regular fa-circle"></i>
-              </button>
+                <button
+                  onClick={handleAbsentAll}
+                  className="px-4 py-2 text-black bg-red-600 rounded border-2">
+                  Absent <i className="fa-regular fa-circle"></i>
+                </button>
+              </th>
+              <th className="py-2 px-4 border-b text-black text-left">
+                <button
+                  onClick={handleCheckAll}
+                  className="px-4 py-2 bg-green-600 text-black rounded border-2">
+                  Present <i className="fa-regular fa-circle"></i>
+                </button>
+              </th>
+              <th className="py-2 px-4 border-b text-black text-left">
+                <button
+                  onClick={handleLeaveAll}
+                  className="px-4 py-2 bg-yellow-400 text-black rounded border-2">
+                  Leave <i className="fa-regular fa-circle"></i>
+                </button>
               </th>
               <th className="py-2 px-4 border-b text-black text-left">Email</th>
             </tr>
@@ -209,22 +289,31 @@ const Attendence = () => {
           <tbody>
             {students.map((student, index) => (
               <tr key={student.rollNo}>
-                <td className="py-2 px-4 border-b text-black" >{student.rollNo}</td>
-                
+                <td className="py-2 px-4 border-b text-black">{student.rollNo}</td>
                 <td className="py-2 px-4 border-b text-black">{student.name}</td>
                 <td className="py-2 px-4 border-b text-black">{student.fathersName}</td>
-                <td className="py-2 px-4 border-b pl-6 text-black"><input
+                <td className="py-2 px-4 border-b pl-6 text-black">
+                  <input
                     type="checkbox"
                     className="w-6 h-6 mx-8"
                     checked={markAbsent[index]}
                     onChange={() => handleAbsentChange(index)}
-                  /></td>
+                  />
+                </td>
                 <td className="py-2 px-4 border-b pl-6">
                   <input
                     className="w-6 h-6 mx-8"
                     type="checkbox"
                     checked={checkedStudents[index]}
                     onChange={() => handleCheckboxChange(index)}
+                  />
+                </td>
+                <td className="py-2 px-4 border-b pl-6">
+                  <input
+                    className="w-6 h-6 mx-8"
+                    type="checkbox"
+                    checked={markLeave[index]}
+                    onChange={() => handleLeaveChange(index)}
                   />
                 </td>
                 <td className="py-2 px-4 border-b text-black">{student.email}</td>
@@ -234,8 +323,8 @@ const Attendence = () => {
         </table>
       </div>
       <div className="flex mt-4 md:flex-row flex-col justify-evenly">
-        <button className="p-4 mx-4 my-2 rounded-lg text-white text-center bg-blue-600 py-2 hover:underline" onClick={handleClearAll} >Clear All</button>
-        <button className="p-4 mx-4 my-2 rounded-lg text-center text-white bg-blue-600 py-2 hover:underline" onClick={handleSubmit} >Submit</button>
+        <button className="p-4 mx-4 my-2 rounded-lg text-white text-center bg-blue-600 py-2 hover:underline" onClick={handleClearAll}>Clear All</button>
+        <button className="p-4 mx-4 my-2 rounded-lg text-center text-white bg-blue-600 py-2 hover:underline" onClick={handleSubmit}>Submit</button>
       </div>
     </div>
   );

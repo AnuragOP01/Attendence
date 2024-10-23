@@ -8,6 +8,12 @@ import Home from './Attendence/Home';
 import Admission from './components/Admission';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import ViewDetail from "./Pages/Dean/ViewDetail";
+import ViewAttendance from "./Dean/ViewAttendence";
+import AddNewBatch from "./Dean/AddNewBatch";
+import ImportCSV from "./Dean/ImportCSV";
+import Monthly from "./Dean/Report/Monthly";
+import ServiceAdmin from "./Dean/ServiceAdmin";
 
 function App() {
   
@@ -23,7 +29,15 @@ function App() {
           <Route path="signup" element={<Signup/>} />
           <Route path='attendence' element={<Attendence/>}/>
           <Route path='admission' element={<Admission/>}/>
-          {/* <Route path='service' element={<Service/>}/> */}
+          
+          <Route path='service' element={<ServiceAdmin/>}>
+            <Route path='monthly' element={<Monthly/>}/>
+            <Route path='viewattendance' element={<ViewAttendance/>}/>
+            <Route path='addbatch' element={<AddNewBatch/>}/> 
+            <Route path='importcsv' element={<ImportCSV/>}/>
+          </Route> 
+
+
           </Route>
           
       </Routes>
