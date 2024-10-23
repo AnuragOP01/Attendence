@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, NavLink } from "react-router-dom";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -56,6 +56,14 @@ const Navbar = () => {
               </a>
             </li>
             <li>
+              <NavLink
+                to="/attendence"
+                className="hover:text-blue-600 text-white dark:hover:text-blue-500"
+              >
+                Attendence
+              </NavLink>
+            </li>
+            <li>
               <a
                 href="#"
                 className="hover:text-blue-600 text-white dark:hover:text-blue-500"
@@ -63,6 +71,7 @@ const Navbar = () => {
                 Details
               </a>
             </li>
+            
           </ul>
         </div>
 
