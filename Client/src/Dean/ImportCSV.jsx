@@ -71,7 +71,7 @@ const ImportCSV = () => {
 
     try {
       
-      const res = await axiosInstance.post('/upload-file/', formData, {
+      const res = await axiosInstance.post('/Phase1/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

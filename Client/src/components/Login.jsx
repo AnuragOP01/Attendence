@@ -11,7 +11,7 @@ function Login() {
     e.preventDefault();
 
     // Check for different user credentials and navigate accordingly
-    if (email === 'anurag@gmail.com' && password === 'anurag123') {
+    if (email === 'staff@gmail.com' && password === 'staff123') {
       navigate('/attendence');
     } else if (email === 'dean@gmail.com' && password === 'dean123') {
       navigate('/service/monthly');
@@ -66,12 +66,12 @@ function Login() {
             Login
           </button>
         </form>
-        <p className="text-sm font-light text-center text-gray-500 dark:text-gray-400">
+        {/* <p className="text-sm font-light text-center text-gray-500 dark:text-gray-400">
           Don’t have an account?{' '}
           <a href="/signup" className="font-medium text-blue-600 hover:underline dark:text-blue-500">
             Sign up
           </a>
-        </p>
+        </p> */}
       </div>
     </div>
   );

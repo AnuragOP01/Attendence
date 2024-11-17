@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { BarChart, Newspaper, Book, Computer } from "lucide-react";
+import { Tooltip } from "@mui/material";
+
 
 const NewSub = () => {
   const [formData, setFormData] = useState({
@@ -54,88 +56,91 @@ const NewSub = () => {
 
   return (
     <div className="flex">
-      <aside className="flex h-screen w-64 flex-col overflow-y-auto bg-gradient-to-br from-black to-gray-900 px-5 py-8 shadow-xl">
-        <div className="flex justify-center items-center mt-4">
-          <a href="/admin">
-            <h1 className="text-2xl md:text-2xl font-bold uppercase bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-gray-500 to-red-500 animate-text">
-              Admin Portal
-            </h1>
-          </a>
+      <aside className="h-screen w-72 bg-gradient-to-br from-black to-gray-900 p-6 shadow-lg">
+        <div className="flex flex-col items-center">
+          <h1 className="text-2xl font-bold uppercase text-transparent bg-clip-text bg-gradient-to-r from-gray-200 via-gray-400 to-gray-500 mt-2 animate-text">
+            Admin Portal
+          </h1>
+          <img
+            src=""
+            alt="photo"
+            className="w-20 h-20 rounded-full border-2 border-gray-500 shadow-lg mt-4"
+          />
+          <h1 className="mt-4 text-lg font-semibold text-white uppercase">
+            Admin Name
+          </h1>
         </div>
-        <img
-          src=""
-          alt="photo"
-          className="w-16 h-16 rounded-full border-2 border-yellow-500 shadow-lg"
-        />
-        <div className="mt-6 flex flex-1 flex-col justify-between">
-          <nav className="-mx-3 space-y-7">
-            <div className="space-y-3">
-              <label className="px-3 text-xl font-bold uppercase text-white">
-                Anurag Rathore
-              </label>
-              <a
-                className="flex transform items-center rounded-lg px-3 py-2 text-gray-200 transition-colors duration-300 hover:bg-gray-50 hover:text-gray-700"
-                href="addnew"
+
+        <nav className="mt-8 space-y-4">
+          <Tooltip title="Add new batches for the upcoming semester" arrow>
+            <a
+              href="/addnew"
+              className="flex items-center px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-500 hover:text-white transform hover:scale-105 transition-all"
+            >
+              <BarChart className="h-5 w-5" />
+              <span className="ml-3 text-sm">Add New Batches</span>
+            </a>
+          </Tooltip>
+
+          <Tooltip title="Register a new student to the system" arrow>
+            <a
+              href="/newstu"
+              className="flex items-center px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-500 hover:text-white transform hover:scale-105 transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                <BarChart className="h-5 w-5" aria-hidden="true" />
-                <span className="mx-2 text-sm font-medium">Add New Batches</span>
-              </a>
-              <a
-                className="flex transform items-center rounded-lg px-3 py-2 text-gray-200 transition-colors duration-300 hover:bg-gray-50 hover:text-gray-700"
-                href="newstu"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-user"
-                >
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-                <span className="mx-2 text-sm font-medium">Add New Student</span>
-              </a>
-              <a
-                className="flex transform items-center rounded-lg px-3 py-2 text-gray-200 transition-colors duration-300 hover:bg-gray-100 hover:text-gray-700"
-                href="newemp"
-              >
-                <Newspaper className="h-5 w-5" aria-hidden="true" />
-                <span className="mx-2 text-sm font-medium">
-                  Add new employees/Professors
-                </span>
-              </a>
-              <a
-                className="flex transform items-center rounded-lg px-3 py-2 text-gray-200 transition-colors duration-300 hover:bg-gray-100 hover:text-gray-700"
-                href="newsub"
-              >
-                <Book className="h-5 w-5" aria-hidden="true" />
-                <span className="mx-2 text-sm font-medium">Add new subjects</span>
-              </a>
-              <a
-                className="flex transform items-center rounded-lg px-3 py-2 text-gray-200 transition-colors duration-300 hover:bg-gray-100 hover:text-gray-700"
-                href="#"
-              >
-                <Computer className="h-5 w-5" aria-hidden="true" />
-                <span className="mx-2 text-sm font-medium">
-                  Create class/sections
-                </span>
-              </a>
-            </div>
-          </nav>
-        </div>
+                <circle cx="12" cy="7" r="4" />
+                <path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2" />
+              </svg>
+              <span className="ml-3 text-sm">Add New Student</span>
+            </a>
+          </Tooltip>
+
+          <Tooltip title="Add new employees or professors" arrow>
+            <a
+              href="/newemp"
+              className="flex items-center px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-500 hover:text-white transform hover:scale-105 transition-all"
+            >
+              <Newspaper className="h-5 w-5" />
+              <span className="ml-3 text-sm">Add New Staff</span>
+            </a>
+          </Tooltip>
+
+          <Tooltip title="Add new subjects to the curriculum" arrow>
+            <a
+              href="/newsub"
+              className="flex items-center px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-500 hover:text-white transform hover:scale-105 transition-all"
+            >
+              <Book className="h-5 w-5" />
+              <span className="ml-3 text-sm">Add New Subjects</span>
+            </a>
+          </Tooltip>
+
+          <Tooltip title="Create and manage classes or sections" arrow>
+            <a
+              href="/adminportal"
+              className="flex items-center px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-500 hover:text-white transform hover:scale-105 transition-all"
+            >
+              <Computer className="h-5 w-5" />
+              <span className="ml-3 text-sm">Create Class/Sections</span>
+            </a>
+          </Tooltip>
+        </nav>
       </aside>
 
       <div className="flex-1 p-10 bg-gradient-to-br from-black to-gray-900 shadow-inner rounded-lg text-white">
         <Outlet />
         <div>
-          <h2 className="mb-3 text-6xl font-bold leading-none tracking-tight text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-gray-400 to-yellow-500 animate-text">
-            ADD NEW SUBJECT
+        <h2 className="mb-3 text-6xl font-bold leading-none tracking-tight text-center bg-clip-text text-transparent bg-gradient-to-r from-gray-500 via-gray-400 to-gray-300 animate-text">
+        ADD NEW SUBJECT
           </h2>
 
           <div id="manualForm" className="mt-8 w-1/2 mx-auto">
