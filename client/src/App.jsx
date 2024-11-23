@@ -21,7 +21,6 @@ import Choi from './Attendence/choice';
 import Fatten from "./facialui/Attendance";
 import Facereg from "./facialui/facereg";
 import Presh from "./facialui/PresenceSheet";
-import PreviewAttendance from "./Attendence/PreviewAttendence";
 
 function App() {
   
@@ -39,7 +38,6 @@ function App() {
           <Route path='attchoi' element={<Choi/>}/>
 
           <Route path='attendence' element={<Attendence/>}/>
-          <Route path='attendence/preview' element={<PreviewAttendance/>}/>
 
           <Route path='service' element={<ServiceAdmin/>}>
             <Route path='monthly' element={<Monthly/>}/>

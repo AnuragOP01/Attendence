@@ -2,13 +2,27 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axiosInstance from "../axiosInstance";
 import { File, Home } from "lucide-react";
+import moment from "moment";
+import TimeRangePicker from "../components/TimeRangePicker";
 
 const Attendence = () => {
-  const [classSection, setClassSection] = useState("");
+  const [classSection, setClassSection] = useState(`${new Date().getFullYear()}-Phase1`);
   const [year, setYear] = useState("");
   const [attendanceDate, setAttendanceDate] = useState("");
   const [attendanceData, setAttendanceData] = useState([]);
-  const [timeSlot, setTimeSlot] = useState("");
+
+  const [timeSlot, setTimeSlot] = useState(() => {
+    const now = moment();
+    const start = moment()
+      .minute(Math.floor(now.minutes() / 30) * 30)
+      .second(0);
+      const end = moment(start).add(1, "hour");
+    return {
+      start: start.format("HH:mm"),
+      end: end.format("HH:mm"),
+    };
+  });
+
   const [subject, setSubject] = useState("");
   const [lectureType, setLectureType] = useState("");
 
@@ -77,43 +91,14 @@ const Attendence = () => {
     "Electives",
   ];
 
-  const timeSlots = [
-    "08:00 AM - 09:00 AM",
-    "09:00 AM - 10:00 AM",
-    "10:00 AM - 11:00 AM",
-    "11:00 AM - 12:00 PM",
-    "12:00 PM - 01:00 PM",
-    "01:00 PM - 02:00 PM",
-    "02:00 PM - 04:00 PM",
-    "04:00 PM - 05:00 PM",
-  ];
-
   useEffect(() => {
-    const now = new Date();
-    const currentTime = now.getHours() * 60 + now.getMinutes(); // Convert current time to minutes
-    const fivePM = 17 * 60; // 5 PM in minutes
+    setAttendanceDate(new Date().toISOString().split("T")[0])
+    console.log(timeSlot);
 
-    if (currentTime > fivePM) {
-      // After 5 PM, allow any time slot
-      setTimeSlot("");
-    } else {
-      // Find the current or next available time slot
-      for (let slot of timeSlots) {
-        const [start, end] = slot.split(" - ").map(parseTime);
-        if (currentTime >= start && currentTime < end) {
-          setTimeSlot(slot);
-          break;
-        }
-      }
-    }
+      setClassSection(`${new Date().getFullYear()}-Phase1`);
+    
+    
   }, []);
-
-  const parseTime = (timeString) => {
-    const [time, modifier] = timeString.split(" ");
-    const [hours, minutes] = time.split(":").map(Number);
-    const isPM = modifier === "PM";
-    return (isPM && hours < 12 ? hours + 12 : hours) * 60 + minutes;
-  };
 
 
   const [filteredStudents, setFilteredStudents] = useState([]);
@@ -142,25 +127,23 @@ const Attendence = () => {
 
   useEffect(() => {
     const fetchAndSetStudents = async () => {
-      await getStudents(`${year}-${classSection}`);
-      switch (classSection) {
-        case "Phase1":
-          setAvailableSubjects(phase1Subjects);
-          break;
-        case "Phase2":
-          setAvailableSubjects(phase2Subjects);
-          break;
-        case "Phase3_P1":
-          setAvailableSubjects(phase3Subjects);
-          break;
-        case "Phase3_P2":
-          setAvailableSubjects(phase4Subjects);
-          break;
-        default:
-          setAvailableSubjects([]);
+      await getStudents(`${classSection}`);
+      
+      if (classSection.includes("Phase1")) {
+        setAvailableSubjects(phase1Subjects);
+        setSubject(phase1Subjects[0][0]);
+        setLectureType(lectures[0])
+      } else if (classSection.includes("Phase2")) {
+        setAvailableSubjects(phase2Subjects);
+      } else if (classSection.includes("Phase3_P1")) {
+        setAvailableSubjects(phase3Subjects);
+      } else if (classSection.includes("Phase3_P2")) {
+        setAvailableSubjects(phase4Subjects);
+      } else {
+        setAvailableSubjects([]);
       }
     };
-
+  
     fetchAndSetStudents();
   }, [classSection]);
 
@@ -177,6 +160,14 @@ const Attendence = () => {
   const handleClearAll = () => {
     setMarkAbsent(new Array(filteredStudents.length).fill(false));
     setCheckedStudents(new Array(filteredStudents.length).fill(false));
+  };
+
+  
+  const handleTimeChange = ({ start, end }) => {
+  const formattedStart = start ? start.format("HH:mm") : null;
+  const formattedEnd = end ? end.format("HH:mm") : null;
+  setTimeSlot({ start: formattedStart, end: formattedEnd });
+  console.log(formattedStart , formattedEnd)
   };
 
   const handleCheckboxChange = (index) => {
@@ -215,10 +206,10 @@ const Attendence = () => {
 
         return {
           roll_no: student.roll_no,
-          phase: `${year}-${classSection}`,
+          phase: classSection,
           date: attendanceDate || new Date().toISOString().split("T")[0],
           status: status,
-          time_slot:timeSlot,
+          time_slot:`${timeSlot.start}-${timeSlot.end}`,
           subject_name: subject,
           lectureType: lectureType,
         };
@@ -274,7 +265,6 @@ const Attendence = () => {
       );
       toast.success("Attendance Confirmed!");
       setShowPreview(false);
-      setShowPostSubmitOptions(true);
     } catch (error) {
       toast.error("Confirmation failed. Please try again.");
       console.log(attendanceData);
@@ -417,40 +407,7 @@ const Attendence = () => {
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 place-content-center my-5 gap-10 place-items-center">
-          <div className="flex flex-col items-start  w-48 ">
-            <label
-              htmlFor="year-section"
-              className="block mb-2 text-sm font-medium text-gray-500 dark:text-white"
-            >
-              Select Batch <span className="text-red-500">*</span>
-            </label>
-            <select
-              id="class-year"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            >
-              <option value="" disabled>
-                Select Batch
-              </option>
-              <option value={new Date().getFullYear()}>
-                {new Date().getFullYear()}
-              </option>
-              <option value={new Date().getFullYear() - 1}>
-                {new Date().getFullYear() - 1}
-              </option>
-              <option value={new Date().getFullYear() - 2}>
-                {new Date().getFullYear() - 2}
-              </option>
-              <option value={new Date().getFullYear() - 3}>
-                {new Date().getFullYear() - 3}
-              </option>
-              <option value={new Date().getFullYear() - 4}>
-                {new Date().getFullYear() - 4}
-              </option>
-            </select>
-          </div>
-
+          
           <div className="flex flex-col items-start  w-48">
             <label
               htmlFor="class-section"
@@ -464,13 +421,10 @@ const Attendence = () => {
               onChange={(e) => setClassSection(e.target.value)}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
-              <option value="" disabled>
-                Select Phase
-              </option>
-              <option value="Phase1">MBBS Phase I</option>
-              <option value="Phase2">MBBS Phase II</option>
-              <option value="Phase3_P1">MBBS Phase III Part I</option>
-              <option value="Phase3_P2">MBBS Phase III Part II</option>
+              <option value={`${new Date().getFullYear()}-Phase1`}>MBBS {`${new Date().getFullYear()}-Phase1`}</option>
+              <option value={`${new Date().getFullYear()-1}-Phase2`}>MBBS {`${new Date().getFullYear()-1}-Phase2`}</option>
+              <option value={`${new Date().getFullYear()-2}-Phase3_P1`}>MBBS {`${new Date().getFullYear()-2}-Phase3_P1`}</option>
+              <option value={`${new Date().getFullYear()-3}-Phase3_P2`}>MBBS {`${new Date().getFullYear()-3}-Phase3_P2`}</option>
             </select>
           </div>
 
@@ -497,29 +451,9 @@ const Attendence = () => {
             >
               Select Time Slot <span className="text-red-500">*</span>
             </label>
-            <select
-              id="time-slot"
-              value={timeSlot}
-              onChange={(e) => setTimeSlot(e.target.value)}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            >
-              <option value="" disabled>
-                Select time slot
-              </option>
-              {timeSlots.map((time, index) => (
-                <option
-                  key={index}
-                  value={time}
-                  disabled={
-                    timeSlot !== time &&
-                    timeSlot !== "" &&
-                    new Date().getHours() < 17
-                  }
-                >
-                  {time}
-                </option>
-              ))}
-            </select>
+            
+            <TimeRangePicker onTimeChange={handleTimeChange} />
+
           </div>
 
           <div className="flex flex-col items-start  w-48">
@@ -535,9 +469,7 @@ const Attendence = () => {
               onChange={(e) => setSubject(e.target.value)}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
-              <option value="" disabled>
-                Select subject
-              </option>
+              
               {availableSubjects.sort().map((subj, index) => (
                 <option key={index} value={subj[0]}>
                   {subj[0]}
@@ -559,9 +491,7 @@ const Attendence = () => {
               onChange={(e) => setLectureType(e.target.value)}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
-              <option value="" disabled>
-                Select Lecture Type
-              </option>
+              
               {lectures.sort().map((lect, index) => (
                 <option key={index} value={lect}>
                   {lect}
