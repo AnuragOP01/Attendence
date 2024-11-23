@@ -10,7 +10,7 @@ const Attendence = () => {
   const [year, setYear] = useState("");
   const [attendanceDate, setAttendanceDate] = useState("");
   const [attendanceData, setAttendanceData] = useState([]);
-
+  const [unknownStatus , setUnknownStatus] = useState("A");
   const [timeSlot, setTimeSlot] = useState(() => {
     const now = moment();
     const start = moment()
@@ -94,10 +94,7 @@ const Attendence = () => {
   useEffect(() => {
     setAttendanceDate(new Date().toISOString().split("T")[0])
     console.log(timeSlot);
-
       setClassSection(`${new Date().getFullYear()}-Phase1`);
-    
-    
   }, []);
 
 
@@ -174,36 +171,81 @@ const Attendence = () => {
     const updatedCheckedStudents = [...checkedStudents];
     updatedCheckedStudents[index] = !updatedCheckedStudents[index];
     setCheckedStudents(updatedCheckedStudents);
-
+  
     if (updatedCheckedStudents[index]) {
       const updatedMarkAbsent = [...markAbsent];
       updatedMarkAbsent[index] = false;
       setMarkAbsent(updatedMarkAbsent);
     }
   };
-
+  
   const handleAbsentChange = (index) => {
     const updatedMarkedStudents = [...markAbsent];
     updatedMarkedStudents[index] = !updatedMarkedStudents[index];
     setMarkAbsent(updatedMarkedStudents);
-
+  
     if (updatedMarkedStudents[index]) {
       const updatedCheckedStudents = [...checkedStudents];
       updatedCheckedStudents[index] = false;
       setCheckedStudents(updatedCheckedStudents);
     }
   };
-
+  
+  const markRemainingStudents = () => {
+    const updatedCheckedStudents = [...checkedStudents];
+    const updatedMarkAbsent = [...markAbsent];
+    
+    const presentCount = checkedStudents.filter(checked => checked).length;
+    const absentCount = markAbsent.filter(absent => absent).length;
+    
+    if (presentCount > 0 && absentCount === 0) {
+      setUnknownStatus("A")
+      filteredStudents.forEach((_, index) => {
+        if (!updatedCheckedStudents[index]) {
+          updatedMarkAbsent[index] = true;
+          updatedCheckedStudents[index] = false;
+          markAbsent[index] = true
+          checkedStudents[index] = false
+        }
+      });
+    }
+    else if (absentCount > 0 && presentCount === 0) {
+      setUnknownStatus("P")
+      filteredStudents.forEach((_, index) => {
+        if (!updatedMarkAbsent[index]) {
+          updatedCheckedStudents[index] = true;
+          updatedMarkAbsent[index] = false;
+          checkedStudents[index] = true;
+          markAbsent[index] = false
+        }
+      });
+    }
+    
+    // setCheckedStudents(updatedCheckedStudents);
+    // setMarkAbsent(updatedMarkAbsent);
+  };
+  
   const formatAttendanceData = () => {
     const attendance_list = filteredStudents 
       .map((student, index) => {
-        let status = "A"; // Default to absent
+        let status = unknownStatus; 
         if (checkedStudents[index]) {
           status = "P";
         } else if (markAbsent[index]) {
           status = "A";
         }
-
+        else {
+          status = unknownStatus;
+          if(unknownStatus === "A"){
+            checkedStudents[index] = true;
+            markAbsent[index] = false;
+          }
+          else{
+            checkedStudents[index] = false;
+            markAbsent[index] = true;
+          }
+        }
+  
         return {
           roll_no: student.roll_no,
           phase: classSection,
@@ -217,37 +259,42 @@ const Attendence = () => {
       .filter(
         (attendance) => attendance.status === "P" || attendance.status === "A"
       );
-
+  
     return { attendance_list };
   };
-
+  
   const handleSubmit = async () => {
-    //  date validation
-    console.log(subject);
-
     if (!attendanceDate) {
       toast.error("Please select attendance date!");
       return;
     }
-
-    // Validate if any student is marked
+  
+    markRemainingStudents();
+  
     const anyStudentMarked =
       checkedStudents.some((checked) => checked) ||
       markAbsent.some((absent) => absent);
+  
+    if (checkedStudents.length < 1) {
+      setUnknownStatus("A");
+    } else if (markAbsent.length < 1) {
+      setUnknownStatus("P");
+    }
+  
     if (!anyStudentMarked) {
       toast.error("Please mark at least one student's attendance!");
       return;
     }
-
+  
     setAttendanceData(formatAttendanceData());
-
+  
     const absentStudents = filteredStudents.filter(
       (student, index) => markAbsent[index]
     );
     const presentStudents = filteredStudents.filter(
       (student, index) => checkedStudents[index]
     );
-
+  
     setPreviewData({
       absentStudents,
       presentStudents,
@@ -256,7 +303,6 @@ const Attendence = () => {
     });
     setShowPreview(true);
   };
-
   const handleConfirmAttendance = async () => {
     try {
       await axiosInstance.post(
@@ -267,9 +313,8 @@ const Attendence = () => {
       setShowPreview(false);
     } catch (error) {
       toast.error("Confirmation failed. Please try again.");
-      console.log(attendanceData);
+      console.log("Error" , error);
       
-      console.log(error);
     }
   };
 
@@ -501,9 +546,9 @@ const Attendence = () => {
           </div>
 
           <div>
-            <button className=" px-4 py-2 bg-blue-600  text-black rounded border-2 ">
+            {/* <button className=" px-4 py-2 bg-blue-600  text-black rounded border-2 ">
               Download Report
-            </button>
+            </button> */}
           </div>
           {filteredStudents.length > 0 && (
             <div className=" flex-1 flex md:flex-row flex-col justify-center top-10 sticky">
